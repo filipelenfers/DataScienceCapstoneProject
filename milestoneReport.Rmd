@@ -1,0 +1,57 @@
+---
+title: "Milestone report -  Capstone Project"
+subtitle: "Coursera Data Science Specialization"
+author: "Filipe Pais Lenfers"
+date: "14 de março de 2015"
+output: html_document
+---
+
+# Synopsis
+
+The Capstone Project objetive is to build a predictive text model from [HC Corpora](http://www.corpora.heliohost.org) database. The model should suggest the next word based on the previous words used. The text documents are provided from diferent three web sources: blogs, twitter and news articles. This report demonstrates the preliminary exploration of the data and the possible ways to build the prediction algorithm.
+
+# Exploratory Analisys
+
+## Obtaining the data
+
+The data has been download from this link: [https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip](https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip), and uncompressed. 
+
+```{r, eval=FALSE, echo=FALSE}
+destination.file <- "Coursera-SwiftKey.zip"
+link <- "http://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip"
+
+download.file(link, destination.file) #Download the data
+unzip(destination.file) # Uncompress the data
+file.rename("final","data") # Rename the final directory to data
+```
+
+There are four languages in this data set. On on each directory.
+```{r}
+list.files("data")
+```
+
+We will concetrate our analysis on the english data, there are 3 files from diferent sources in data:
+```{r}
+list.files("data/en_US")
+```
+
+The source of the files are from:
+
+* Blogs
+* Newspappers
+* Twitter
+
+More details can be found in [HC Corpora](http://www.corpora.heliohost.org/aboutcorpus.html) website.
+
+## Data Cleanning and Preprocessing
+
+We will concentrate our analysis in the english files.
+```{r,cache=TRUE}
+blogs <- readLines("data/en_US/en_US.blogs.txt", encoding="UTF-8")
+twitter <- readLines("data/en_US/en_US.twitter.txt", encoding="UTF-8")
+news  <- readLines("data/en_US/en_US.news.txt", encoding="UTF-8")
+```
+
+
+## Basic Data Analysis
+
