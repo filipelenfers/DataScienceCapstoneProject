@@ -3,12 +3,12 @@ library(tm)
 library(RWeka)
 
 blogs <- readLines("data/en_US/en_US.blogs.txt", encoding="UTF-8")
-twitter <- readLines("data/en_US/en_US.twitter.txt", encoding="UTF-8")
-news  <- readLines("data/en_US/en_US.news.txt", encoding="UTF-8")
+#twitter <- readLines("data/en_US/en_US.twitter.txt", encoding="UTF-8")
+#news  <- readLines("data/en_US/en_US.news.txt", encoding="UTF-8")
 
 sample_blogs <- sample(blogs,100000)
-sample_twitter <- sample(twitter,100000)
-sample_news <- sample(news,100000)
+#sample_twitter <- sample(twitter,100000)
+#sample_news <- sample(news,100000)
 
 rm(blogs,twitter,news)
 
