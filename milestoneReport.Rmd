@@ -141,6 +141,13 @@ save(sample.blogs,sample.twitter,sample.news,file="samples.RData")
 load("samples.RData")
 ```
 
+Lets convert the encoding of the characters, removing the non-convertible characters.
+```{r, cache=TRUE}
+sample_blogs <- iconv(sample_blogs, "latin1", "ASCII", sub="")
+sample_twitter <- iconv(sample_twitter, "latin1", "ASCII", sub="")
+sample_news <- iconv(sample_twitter, "latin1", "ASCII", sub="")
+```
+
 Now we need to clean the text, making all text lower case, removing pontuation, removing the number, removing the [stop words](http://en.wikipedia.org/wiki/Stop_words), removing profanities and striping the white spaces.We also (stem)[http://en.wikipedia.org/wiki/Stemming] the text.
 The list of profanity words was obtained from [https://github.com/shutterstock/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words/blob/master/en](https://github.com/shutterstock/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words/blob/master/en).
 This steps will make the data easier to analize.
