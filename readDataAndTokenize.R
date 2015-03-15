@@ -1,6 +1,7 @@
 library(stringi)
 library(tm)
 library(RWeka)
+library(ggplot2)
 
 blogs <- readLines("data/en_US/en_US.blogs.txt", encoding="UTF-8")
 twitter <- readLines("data/en_US/en_US.twitter.txt", encoding="UTF-8")
@@ -40,7 +41,16 @@ unigram.df <- data.frame(Term = unigram.termdocmatrix$dimnames$Terms, Freq = uni
 sum(row_sums(unigram.termdocmatrix)) == sum(unigram.df$Freq) #Sanity check
 
 head(sort(row_sums(unigram.termdocmatrix), decreasing = T))
-head(unigram.df[order(unigram.df$Freq,decreasing = T),])
+unigram.df <- unigram.df[order(unigram.df$Freq,decreasing = T),]
+head(unigram.df)
+
+ggplot(head(unigram.df,10), aes(x=reorder(Term,-Freq), y=Freq)) +
+  geom_bar(stat="Identity", fill="yellow") +
+  geom_text(aes(label=Freq), vjust = -0.5) +
+  ggtitle("Unigrams frequency\nTwitter") +
+  ylab("Frequency") +
+  xlab("Term")
+  
 
 
 
@@ -54,6 +64,8 @@ head(trigram.df,200)
 #head(data.frame(inspect(termdocmatrix)),200)
 head(trigram.df[order(trigram.df$termdocmatrix.v,decreasing = T),],100)
 as.character(trigram.df$termdocmatrix.dimnames.Terms[1])
+
+
 
 
 #UnigramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min = 1, max = 1))
