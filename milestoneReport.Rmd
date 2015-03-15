@@ -12,11 +12,21 @@ The Capstone Project objetive is to build a predictive text model from [HC Corpo
 
 # Exploratory Analisys
 
+## Libraries
+
+Libraries used in this study.
+```{r}
+library(stringi)
+library(tm)
+library(RWeka)
+```
+
+
 ## Obtaining the data
 
 The data has been download from this link: [https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip](https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip), and uncompressed. 
 
-```{r, eval=FALSE, echo=FALSE}
+```{r, eval=FALSE}
 destination.file <- "Coursera-SwiftKey.zip"
 link <- "http://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip"
 
@@ -43,15 +53,139 @@ The source of the files are from:
 
 More details can be found in [HC Corpora](http://www.corpora.heliohost.org/aboutcorpus.html) website.
 
-## Data Cleanning and Preprocessing
+# Files Analysis
 
-We will concentrate our analysis in the english files.
-```{r,cache=TRUE}
-blogs <- readLines("data/en_US/en_US.blogs.txt", encoding="UTF-8")
-twitter <- readLines("data/en_US/en_US.twitter.txt", encoding="UTF-8")
-news  <- readLines("data/en_US/en_US.news.txt", encoding="UTF-8")
+Lets load the three files to obtain some basic information about then.
+```{r,cache=TRUE,warning=FALSE}
+blog.file <- "data/en_US/en_US.blogs.txt"
+twitter.file <- "data/en_US/en_US.twitter.txt"
+news.file <- "data/en_US/en_US.news.txt"
+blogs <- readLines(blog.file, encoding="UTF-8")
+twitter <- readLines(twitter.file, encoding="UTF-8")
+news  <- readLines(news.file, encoding="UTF-8")
 ```
 
+Blog file:
 
-## Basic Data Analysis
+* File name: `r blog.file`.
+* File size: `r round(file.info(blog.file)$size/1024/1024,2)` MB.
+* Lines and chars statistics on the file:
+```{r, cache=TRUE}
+data.frame(t(stri_stats_general(blogs)))
+```
+* Summary of the char quantities per line:
+```{r,cache=TRUE}
+summary(sapply(blogs,FUN=nchar))
+```
+* Words summary:
+```{r,cache=TRUE}
+summary(stri_count_words(blogs))
+```
 
+Twitter file:
+
+* File name: `r twitter.file`.
+* File size: `r round(file.info(twitter.file)$size/1024/1024,2)` MB.
+```{r, cache=TRUE}
+data.frame(t(stri_stats_general(twitter)))
+```
+* Summary of the char quantities per line:
+```{r,cache=TRUE}
+summary(sapply(twitter,FUN=nchar))
+```
+* Words summary:
+```{r,cache=TRUE}
+summary(stri_count_words(twitter))
+```
+
+News file:
+
+* File name: `r news.file`.
+* File size: `r round(file.info(news.file)$size/1024/1024,2)` MB.
+```{r, cache=TRUE}
+data.frame(t(stri_stats_general(news)))
+```
+* Summary of the char quantities per line:
+```{r,cache=TRUE}
+summary(sapply(news,FUN=nchar))
+```
+* Words summary:
+```{r,cache=TRUE}
+summary(stri_count_words(news))
+```
+
+## Data Cleanning and Preprocessing
+
+As we could see in the previous section the files are too big, so we will extract some samples to work with.
+```{r}
+sample.size <- 100000
+```
+
+```{r, eval=FALSE}
+sample.blogs <- sample(blogs,sample.size)
+sample.twitter <- sample(twitter,sample.size)
+sample.news <- sample(news,sample.size)
+```
+
+* sample.blogs has `r round(sample.size/length(blogs)*100.0,2)`% of the original data.
+* sample.twitter has `r round(sample.size/length(twitter)*100.0,2)`% of the original data.
+* sample.news has `r round(sample.size/length(news)*100.0,2)`% of the original data.
+
+To garantie the reproducibility of this research we will save the samples and load then as needed.
+
+```{r,eval=FALSE}
+save(sample.blogs,sample.twitter,sample.news,file="samples.RData")
+```
+
+```{r}
+load("samples.RData")
+```
+
+Now we need to clean the text, making all text lower case, removing pontuation, removing the number, removing the [stop words](http://en.wikipedia.org/wiki/Stop_words), removing profanities and striping the white spaces.We also (stem)[http://en.wikipedia.org/wiki/Stemming] the text.
+The list of profanity words was obtained from [https://github.com/shutterstock/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words/blob/master/en](https://github.com/shutterstock/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words/blob/master/en).
+This steps will make the data easier to analize.
+```{r, cache=TRUE}
+profanity.words <- readLines("en_profanity_words.txt")
+
+corpus.blogs <- Corpus(VectorSource(list(sample.blogs)))
+corpus.blogs <- tm_map(corpus.blogs, content_transformer(tolower))
+corpus.blogs <- tm_map(corpus.blogs, content_transformer(removePunctuation))
+corpus.blogs <- tm_map(corpus.blogs, content_transformer(removeNumbers))
+corpus.blogs <- tm_map(corpus.blogs, removeWords, stopwords("english"))
+corpus.blogs <- tm_map(corpus.blogs, removeWords, profanity.words)
+corpus <- tm_map(corpus.blogs, stripWhitespace)
+
+corpus.blogs <- tm_map(corpus.blogs, stemDocument, language='english')
+```
+
+```{r, cache=TRUE}
+corpus.twitter <- Corpus(VectorSource(list(sample.twitter)))
+corpus.twitter <- tm_map(corpus.twitter, content_transformer(tolower))
+corpus.twitter <- tm_map(corpus.twitter, content_transformer(removePunctuation))
+corpus.twitter <- tm_map(corpus.twitter, content_transformer(removeNumbers))
+corpus.twitter <- tm_map(corpus.twitter, removeWords, stopwords("english"))
+corpus.twitter <- tm_map(corpus.twitter, removeWords, profanity.words)
+corpus.twitter <- tm_map(corpus.twitter, stripWhitespace)
+
+corpus.twitter <- tm_map(corpus.twitter, stemDocument, language='english')
+```
+
+```{r, cache=TRUE}
+corpus.news <- Corpus(VectorSource(list(sample.news)))
+corpus.news <- tm_map(corpus.news, content_transformer(tolower))
+corpus.news <- tm_map(corpus.news, content_transformer(removePunctuation))
+corpus.news <- tm_map(corpus.news, content_transformer(removeNumbers))
+corpus.news <- tm_map(corpus.news, removeWords, stopwords("english"))
+corpus.news <- tm_map(corpus.news, removeWords, profanity.words)
+corpus.news <- tm_map(corpus.news, stripWhitespace)
+
+corpus.news <- tm_map(corpus.news, stemDocument, language='english')
+```
+
+The data is prepared to be analized.
+
+## Data Analysis
+
+### Unigram analysis
+
+### Bigram analysis
