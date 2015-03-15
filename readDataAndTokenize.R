@@ -21,7 +21,7 @@ sample_twitter <- iconv(sample_twitter, "latin1", "ASCII", sub="")
 #                        encoding='utf-8')
 # corpus <- Corpus(dirSource)
 #corpus <- Corpus(VectorSource(list(sample_blogs,sample_twitter,sample_news)))
-corpus <- Corpus(VectorSource(list(sample_twitter)))
+corpus <- Corpus(VectorSource(list(sample.blogs,sample.twitter)))
 
 corpus <- tm_map(corpus, content_transformer(tolower))
 corpus <- tm_map(corpus, content_transformer(removePunctuation))
@@ -34,7 +34,7 @@ corpus <- tm_map(corpus, stemDocument, language='english')
 
 
 TrigramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min = 3, max = 3))
-termdocmatrix <- TermDocumentMatrix(corpus, control = list(tokenize = TrigramTokenizer))
+termdocmatrix <- TermDocumentMatrix(corpus[1], control = list(tokenize = TrigramTokenizer))
 #termdocmatrix <- removeSparseTerms(termdocmatrix,0.999)
 
 #head(data.frame(inspect(termdocmatrix)),100)
