@@ -17,14 +17,14 @@ load("samples.RData")
 #rm(blogs,twitter,news)
 
 sample_blogs <- iconv(sample_blogs, "latin1", "ASCII", sub="")
-sample_twitter <- iconv(sample_twitter, "latin1", "ASCII", sub="")
+sample.twitter <- iconv(sample.twitter, "latin1", "ASCII", sub="")
 sample_news <- iconv(sample_twitter, "latin1", "ASCII", sub="")
 
 # dirSource <- DirSource(directory='data/en_us',
 #                        encoding='utf-8')
 # corpus <- Corpus(dirSource)
 #corpus <- Corpus(VectorSource(list(sample_blogs,sample_twitter,sample_news)))
-corpus <- Corpus(VectorSource(list(sample.blogs,sample.twitter)))
+corpus <- Corpus(VectorSource(list(sample.twitter)))
 
 corpus <- tm_map(corpus, content_transformer(tolower))
 corpus <- tm_map(corpus, content_transformer(removePunctuation))
