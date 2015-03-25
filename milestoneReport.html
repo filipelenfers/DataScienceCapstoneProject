@@ -64,7 +64,6 @@ img {
 <h1 class="title">Milestone report - Capstone Project</h1>
 <h1 class="subtitle">Coursera Data Science Specialization</h1>
 <h4 class="author"><em>Filipe Pais Lenfers</em></h4>
-<h4 class="date"><em>14 de março de 2015</em></h4>
 </div>
 
 
@@ -222,7 +221,7 @@ corpus.blogs &lt;- tm_map(corpus.blogs, content_transformer(removePunctuation))
 corpus.blogs &lt;- tm_map(corpus.blogs, content_transformer(removeNumbers))
 corpus.blogs &lt;- tm_map(corpus.blogs, removeWords, stopwords(&quot;english&quot;))
 corpus.blogs &lt;- tm_map(corpus.blogs, removeWords, profanity.words)
-corpus &lt;- tm_map(corpus.blogs, stripWhitespace)
+corpus.blogs &lt;- tm_map(corpus.blogs, stripWhitespace)
 
 corpus.blogs &lt;- tm_map(corpus.blogs, stemDocument, language='english')</code></pre>
 <pre class="r"><code>corpus.twitter &lt;- Corpus(VectorSource(list(sample.twitter)))

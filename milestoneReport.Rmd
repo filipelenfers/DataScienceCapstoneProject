@@ -1,7 +1,6 @@
 ---
 title: "Milestone report -  Capstone Project"
 author: "Filipe Pais Lenfers"
-date: "14 de março de 2015"
 output:
   html_document:
     fig_height: 6
@@ -165,7 +164,7 @@ corpus.blogs <- tm_map(corpus.blogs, content_transformer(removePunctuation))
 corpus.blogs <- tm_map(corpus.blogs, content_transformer(removeNumbers))
 corpus.blogs <- tm_map(corpus.blogs, removeWords, stopwords("english"))
 corpus.blogs <- tm_map(corpus.blogs, removeWords, profanity.words)
-corpus <- tm_map(corpus.blogs, stripWhitespace)
+corpus.blogs <- tm_map(corpus.blogs, stripWhitespace)
 
 corpus.blogs <- tm_map(corpus.blogs, stemDocument, language='english')
 ```
