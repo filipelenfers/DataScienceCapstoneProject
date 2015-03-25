@@ -18,30 +18,14 @@ train.sample.idx <- sample.int(length(sample.blogs), length(sample.blogs)*0.80)
 train.sample.blogs <- sample.blogs[train.sample.idx]
 test.sample.blogs <- sample(sample.blogs[-train.sample.idx])
 
+createCorpus
 train.sample.blogs <- iconv(train.sample.blogs, "latin1", "ASCII", sub="")
 test.sample.blogs <- iconv(train.sample.blogs, "latin1", "ASCII", sub="")
 
 
-#Clean data-------------------------------------------
-profanity.words <- readLines("en_profanity_words.txt")
-
-train.corpus.blogs <- Corpus(VectorSource(list(train.sample.blogs)))
-train.corpus.blogs <- tm_map(train.corpus.blogs, content_transformer(tolower))
-train.corpus.blogs <- tm_map(train.corpus.blogs, content_transformer(removePunctuation))
-train.corpus.blogs <- tm_map(train.corpus.blogs, content_transformer(removeNumbers))
-#train.corpus.blogs <- tm_map(train.corpus.blogs, removeWords, stopwords("english"))
-#train.corpus.blogs <- tm_map(train.corpus.blogs, removeWords, profanity.words)
-train.corpus.blogs <- tm_map(train.corpus.blogs, stripWhitespace)
-#train.corpus.blogs <- tm_map(train.corpus.blogs, stemDocument, language='english')
-
-test.corpus.blogs <- Corpus(VectorSource(list(test.sample.blogs)))
-test.corpus.blogs <- tm_map(test.corpus.blogs, content_transformer(tolower))
-test.corpus.blogs <- tm_map(test.corpus.blogs, content_transformer(removePunctuation))
-test.corpus.blogs <- tm_map(test.corpus.blogs, content_transformer(removeNumbers))
-#test.corpus.blogs <- tm_map(test.corpus.blogs, removeWords, stopwords("english"))
-#test.corpus.blogs <- tm_map(test.corpus.blogs, removeWords, profanity.words)
-test.corpus.blogs <- tm_map(test.corpus.blogs, stripWhitespace)
-#test.corpus.blogs <- tm_map(test.corpus.blogs, stemDocument, language='english')
+#Create clean corpus-------------------------------------------
+train.corpus.blogs <- createCorpus(train.sample.blogs)
+test.corpus.blogs <- createCorpus(test.sample.blogs)
 #------------------------------------------------------
 
 
@@ -56,37 +40,10 @@ test.trigram.df.blogs <- generateNgramDf(test.corpus.blogs,3)
 test.tetragram.df.blogs <- generateNgramDf(test.corpus.blogs,4)
 #-------------------------------------------------------------------------------------------
 
-#Generate 2-gram probabilities---------------------------------------
-bigram.targets <- sapply(strsplit(bigram.df.blogs$Term, ' '), function(a) a[2])
-
-bigram.df.blogs <- data.frame(bigram.df.blogs,target = bigram.targets, stringsAsFactors = F)
-rm(bigram.targets)
-
-bigram.keys <- sapply(strsplit(bigram.df.blogs$Term, ' '), function(a) a[1])
-
-bigram.df.blogs <- data.frame(bigram.df.blogs,key = bigram.keys, stringsAsFactors = F)
-rm(bigram.keys)
-
-bigram.key.sum <- bigram.df.blogs %>%
-  group_by(key) %>%
-  summarise(total=sum(Freq))
-
-bigram.df.blogs <- inner_join(bigram.df.blogs,bigram.key.sum,by="key") %>% 
-  mutate(prob = Freq/total)
-rm(bigram.key.sum) 
-
-#------------------------------------------------------------------------------
-
-#Generate 3-gram probabilities---------------------------------------
+#Generate N-gram probabilities---------------------------------------
+bigram.df.blogs <- generateNgramProb(bigram.df.blogs,2)
 trigram.df.blogs <- generateNgramProb(trigram.df.blogs,3)
-head(trigram.df.blogs)
-
-#------------------------------------------------------------------------------
-
-#Generate 4-gram probabilities---------------------------------------
 tetragram.df.blogs <- generateNgramProb(tetragram.df.blogs,4)
-head(tetragram.df.blogs)
-
 #------------------------------------------------------------------------------
 
 

@@ -1,5 +1,7 @@
 library(dplyr)
 
+profanity.words <- readLines("en_profanity_words.txt")
+
 perplexity <- function(prob) {
   N <- length(prob)
   p <- (-1/N) * sum(log2(test.bigram.prob))
@@ -36,4 +38,22 @@ generateNgramDf <- function(corpus,N) {
   df <- data.frame(Term = tdm$dimnames$Terms, Freq = tdm$v, stringsAsFactors = F) 
   #test.trigram.df.blogs$Term <- as.character(test.trigram.df.blogs$Term)
   return(df)
+}
+
+cleanCorpus <- function(corpus) {
+  corpus <- tm_map(corpus, content_transformer(tolower))
+  corpus <- tm_map(corpus, content_transformer(removePunctuation))
+  corpus <- tm_map(corpus, content_transformer(removeNumbers))
+  #corpus <- tm_map(corpus, removeWords, stopwords("english"))
+  #corpus <- tm_map(corpus, removeWords, profanity.words)
+  corpus <- tm_map(corpus, stripWhitespace)
+  #corpus <- tm_map(corpus, stemDocument, language='english')
+  return(corpus)
+}
+
+createCorpus <- function(text) {
+  text <- iconv(text, "latin1", "ASCII", sub="")
+  corpus <- Corpus(VectorSource(list(text)))
+  corpus <- cleanCorpus(corpus)
+  return(corpus)
 }
