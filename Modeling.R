@@ -6,6 +6,8 @@ library(RWeka)
 library(ggplot2)
 library(dplyr)
 
+source("baseFunctions.R")
+
 blog.file <- "data/en_US/en_US.blogs.txt"
 blogs <- readLines(blog.file, encoding="UTF-8")
 sample.size <- trunc(length(blogs)*0.02)
