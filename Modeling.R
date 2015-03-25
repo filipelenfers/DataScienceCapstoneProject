@@ -81,17 +81,26 @@ test.bigram.termdocmatrix.blogs <- TermDocumentMatrix(test.corpus.blogs, control
 test.bigram.df.blogs <- data.frame(Term = test.bigram.termdocmatrix.blogs$dimnames$Terms) 
 rm(test.bigram.termdocmatrix.blogs)
 test.bigram.df.blogs$Term <- as.character(test.bigram.df.blogs$Term)
+
+test.trigram.termdocmatrix.blogs <- TermDocumentMatrix(test.corpus.blogs, control = list(tokenize = TrigramTokenizer)) 
+test.trigram.df.blogs <- data.frame(Term = test.trigram.termdocmatrix.blogs$dimnames$Terms) 
+rm(test.trigram.termdocmatrix.blogs)
+test.trigram.df.blogs$Term <- as.character(test.trigram.df.blogs$Term)
+
+test.tetragram.df.blogs <- generateNgramDf(test.corpus.blogs,4)
+head(test.tetragram.df.blogs)
+summary(test.tetragram.df.blogs)
 #-------------------------------------------------------------------------------------------
 
 #Generate 2-gram probabilities---------------------------------------
 bigram.targets <- sapply(strsplit(bigram.df.blogs$Term, ' '), function(a) a[2])
 
-bigram.df.blogs <- data.frame(bigram.df.blogs,target = bigram.targets)
+bigram.df.blogs <- data.frame(bigram.df.blogs,target = bigram.targets, stringsAsFactors = F)
 rm(bigram.targets)
 
 bigram.keys <- sapply(strsplit(bigram.df.blogs$Term, ' '), function(a) a[1])
 
-bigram.df.blogs <- data.frame(bigram.df.blogs,key = bigram.keys)
+bigram.df.blogs <- data.frame(bigram.df.blogs,key = bigram.keys, stringsAsFactors = F)
 rm(bigram.keys)
 
 bigram.key.sum <- bigram.df.blogs %>%
@@ -101,42 +110,57 @@ bigram.key.sum <- bigram.df.blogs %>%
 bigram.df.blogs <- inner_join(bigram.df.blogs,bigram.key.sum,by="key") %>% 
   mutate(prob = Freq/total)
 rm(bigram.key.sum) 
+
 #------------------------------------------------------------------------------
+
+#Generate 3-gram probabilities---------------------------------------
+trigram.df.blogs <- generateNgramProb(trigram.df.blogs,3)
+head(trigram.df.blogs)
+
+#------------------------------------------------------------------------------
+
+#Generate 4-gram probabilities---------------------------------------
+tetragram.df.blogs <- generateNgramProb(tetragram.df.blogs,4)
+head(tetragram.df.blogs)
+
+#------------------------------------------------------------------------------
+
 
 #Calculate perplexidade --------------------
 #using http://en.wikipedia.org/wiki/Perplexity, Perplexity of a probability model
 # https://courses.engr.illinois.edu/cs498jh/HW/hw1.pdf
 
 test.bigram.prob <- (left_join(test.bigram.df.blogs,bigram.df.blogs,by="Term") %>% select(prob))$prob
-test.bigram.prob[is.na(test.bigram.prob)] <- 1/500000
-#TODO fazer smotthing dos NA usando stupid backoff para quando eu tiver vários grams
-
+test.bigram.prob[is.na(test.bigram.prob)] <- 1/500000 #TODO fazer smotthing dos NA usando stupid backoff para quando eu tiver vários grams
 perplexity(test.bigram.prob)
+
+test.trigram.prob <- (left_join(test.trigram.df.blogs,trigram.df.blogs,by="Term") %>% select(prob))$prob
+test.trigram.prob[is.na(test.trigram.prob)] <- 1/500000 #TODO fazer smotthing dos NA usando stupid backoff para quando eu tiver vários grams
+perplexity(test.trigram.prob)
+
+test.tetragram.prob <- (left_join(test.tetragram.df.blogs,tetragram.df.blogs,by="Term") %>% select(prob))$prob
+test.tetragram.prob[is.na(test.tetragram.prob)] <- 1/500000 #TODO fazer smotthing dos NA usando stupid backoff para quando eu tiver vários grams
+perplexity(test.tetragram.prob)
 #--------------------------------------------------------------------------------
 
+#Generate 2-gram test key-target-----------------------------------------------
+test.bigram.targets <- sapply(strsplit(test.bigram.df.blogs$Term, ' '), function(a) a[2])
+
+test.bigram.df.blogs <- data.frame(test.bigram.df.blogs,target = test.bigram.targets, stringsAsFactors = F)
+rm(test.bigram.targets)
+
+test.bigram.keys <- sapply(strsplit(test.bigram.df.blogs$Term, ' '), function(a) a[1])
+
+test.bigram.df.blogs <- data.frame(test.bigram.df.blogs,key = test.bigram.keys, stringsAsFactors = F)
+rm(test.bigram.keys)
+#------------------------------------------------------------------------------
+
+#Calculate accuracy --------------------
+ 
+
+#----------------------------------------
 
 
-
-trigram.targets <- foreach( d = iter(as.character(trigram.df.blogs$Term)), .combine = "c") %dopar%
-  strsplit(d," ")[[1]][3]
-
-trigram.df.blogs <- data.frame(trigram.df.blogs,target = trigram.targets)
-rm(bigram.targets)
-
-trigram.keys <- foreach( d = iter(as.character(trigram.df.blogs$Term)), .combine = "c") %dopar% {
-  temp <- strsplit(d," ")[[1]]
-  paste[temp[1],temp[2])
-}
-  
-
-trigram.df.blogs <- data.frame(trigram.df.blogs,key = trigram.keys)
-rm(trigram.keys)
-
-
-
-
-tetragram.targets <- foreach( d = iter(as.character(tretragram.df.blogs$Term)), .combine = "c") %dopar%
-  strsplit(d," ")[[1]][4]
 
 #TODO pesquisa rápida, fastmatch? hash?
 
