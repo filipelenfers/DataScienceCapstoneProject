@@ -44,39 +44,10 @@ test.corpus.blogs <- tm_map(test.corpus.blogs, stripWhitespace)
 
 
 #Generate N-grams-------------
-UnigramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min = 1, max = 1)) 
-BigramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min = 2, max = 2)) 
-TrigramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min = 3, max = 3)) 
-TetragramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min = 4, max = 4)) 
-
-unigram.termdocmatrix.blogs <- TermDocumentMatrix(train.corpus.blogs, control = list(tokenize = UnigramTokenizer)) 
-unigram.df.blogs <- data.frame(Term = unigram.termdocmatrix.blogs$dimnames$Terms, 
-                              Freq = unigram.termdocmatrix.blogs$v) 
-unigram.df.blogs <- unigram.df.blogs[order(unigram.df.blogs$Freq,decreasing = T),] 
-rm(unigram.termdocmatrix.blogs)
-
-bigram.termdocmatrix.blogs <- TermDocumentMatrix(train.corpus.blogs, control = list(tokenize = BigramTokenizer)) 
-bigram.df.blogs <- data.frame(Term = bigram.termdocmatrix.blogs$dimnames$Terms, 
-                              Freq = bigram.termdocmatrix.blogs$v) 
-bigram.df.blogs <- bigram.df.blogs[order(bigram.df.blogs$Freq,decreasing = T),] 
-rm(bigram.termdocmatrix.blogs)
-bigram.df.blogs$Term <- as.character(bigram.df.blogs$Term)
-
-trigram.termdocmatrix.blogs <- TermDocumentMatrix(train.corpus.blogs, control = list(tokenize = TrigramTokenizer)) 
-trigram.df.blogs <- data.frame(Term = trigram.termdocmatrix.blogs$dimnames$Terms, 
-                              Freq = trigram.termdocmatrix.blogs$v) 
-trigram.df.blogs <- trigram.df.blogs[order(trigram.df.blogs$Freq,decreasing = T),] 
-rm(trigram.termdocmatrix.blogs)
-trigram.df.blogs$Term <- as.character(trigram.df.blogs$Term)
-
-tetragram.termdocmatrix.blogs <- TermDocumentMatrix(train.corpus.blogs, control = list(tokenize = TetragramTokenizer)) 
-tetragram.df.blogs <- data.frame(Term = tetragram.termdocmatrix.blogs$dimnames$Terms, 
-                               Freq = tetragram.termdocmatrix.blogs$v) 
-tetragram.df.blogs <- tetragram.df.blogs[order(tetragram.df.blogs$Freq,decreasing = T),] 
-rm(tetragram.termdocmatrix.blogs)
-tetragram.df.blogs$Term <- as.character(tetragram.df.blogs$Term)
-
-
+unigram.termdocmatrix.blogs <- generateNgramDf(train.corpus.blogs,1)
+bigram.df.blogs <- generateNgramDf(train.corpus.blogs,2)
+trigram.df.blogs <- generateNgramDf(train.corpus.blogs,3)
+tetragram.df.blogs <- generateNgramDf(train.corpus.blogs,4)
 
 test.bigram.df.blogs <- generateNgramDf(test.corpus.blogs,2)
 test.trigram.df.blogs <- generateNgramDf(test.corpus.blogs,3)
