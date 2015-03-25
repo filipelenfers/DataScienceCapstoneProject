@@ -77,19 +77,10 @@ rm(tetragram.termdocmatrix.blogs)
 tetragram.df.blogs$Term <- as.character(tetragram.df.blogs$Term)
 
 
-test.bigram.termdocmatrix.blogs <- TermDocumentMatrix(test.corpus.blogs, control = list(tokenize = BigramTokenizer)) 
-test.bigram.df.blogs <- data.frame(Term = test.bigram.termdocmatrix.blogs$dimnames$Terms) 
-rm(test.bigram.termdocmatrix.blogs)
-test.bigram.df.blogs$Term <- as.character(test.bigram.df.blogs$Term)
 
-test.trigram.termdocmatrix.blogs <- TermDocumentMatrix(test.corpus.blogs, control = list(tokenize = TrigramTokenizer)) 
-test.trigram.df.blogs <- data.frame(Term = test.trigram.termdocmatrix.blogs$dimnames$Terms) 
-rm(test.trigram.termdocmatrix.blogs)
-test.trigram.df.blogs$Term <- as.character(test.trigram.df.blogs$Term)
-
+test.bigram.df.blogs <- generateNgramDf(test.corpus.blogs,2)
+test.trigram.df.blogs <- generateNgramDf(test.corpus.blogs,3)
 test.tetragram.df.blogs <- generateNgramDf(test.corpus.blogs,4)
-head(test.tetragram.df.blogs)
-summary(test.tetragram.df.blogs)
 #-------------------------------------------------------------------------------------------
 
 #Generate 2-gram probabilities---------------------------------------
