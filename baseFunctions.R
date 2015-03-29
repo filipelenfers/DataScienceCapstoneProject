@@ -1,5 +1,4 @@
 library(dplyr)
-library(compiler) 
 
 profanity.words <- readLines("en_profanity_words.txt")
 
@@ -45,22 +44,28 @@ generateNgramDf <- function(corpus,N) {
   return(df)
 }
 
-cleanCorpus <- cmpfun(function(corpus) {
+cleanCorpus <- function(corpus,removeStopWords = F, steam = F) {
   corpus <- tm_map(corpus, content_transformer(tolower))
   corpus <- tm_map(corpus, content_transformer(removePunctuation))
   corpus <- tm_map(corpus, content_transformer(removeNumbers))
-  #corpus <- tm_map(corpus, removeWords, stopwords("english"))
+  if (removeStopWords) {
+    print("Removing stopwords!")
+    corpus <- tm_map(corpus, removeWords, stopwords("english"))
+  }
   #corpus <- tm_map(corpus, removeWords, profanity.words)
   corpus <- tm_map(corpus, stripWhitespace)
-  #corpus <- tm_map(corpus, stemDocument, language='english')
+  if (steam) {
+    print("Steamin document!")
+    corpus <- tm_map(corpus, stemDocument, language='english')
+  }
   return(corpus)
-})
+}
 
-createCorpus <- cmpfun(function(text,clean = T) {
+createCorpus <- function(text,clean = T, removeStopWords = F, steam = F) {
   text <- iconv(text, "latin1", "ASCII", sub="")
   corpus <- Corpus(VectorSource(list(text)))
   if(clean) {
-    corpus <- cleanCorpus(corpus)
+    corpus <- cleanCorpus(corpus,removeStopWords, steam)
   }
   return(corpus)
-})
+}
