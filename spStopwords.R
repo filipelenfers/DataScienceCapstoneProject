@@ -14,8 +14,8 @@ load("tetragram.df.clean.remstop.RData")
 # http://www.aclweb.org/anthology/D07-1090.pdf
 
 ##Parameters
-input <- "Very early observations on the Bills game: Offense still struggling but the"
-num.results <- 3
+input <- "I like how the same people are in almost all of Adam Sandler's"
+num.results <- 50
 alpha = 0.4
 
 #Clean input
@@ -64,6 +64,6 @@ unigram.predictions <- head(unigram.df.remstop[order(unigram.df.remstop$score, d
 unigram.predictions
 
 spStopwordPredictions <- rbind(tetragram.predictions,trigram.predictions,bigram.predictions,unigram.predictions)
-
+spStopwordPredictions
 
 #------------------------------------------------------------------------------
