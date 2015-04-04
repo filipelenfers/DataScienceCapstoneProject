@@ -3,8 +3,11 @@
 # some part of the N-grams are dominated by stopwords
 
 library(tm)
+library(data.table)
 
+#All the data has the score pre calculated considering alpha as 0.4
 load("spData.RData")
+
 
 #Stupid backoff 4-gram------------------------------------------------------------------------------
 # http://www.aclweb.org/anthology/D07-1090.pdf
@@ -78,7 +81,7 @@ predict <- function(input,num.results = 3) {
       }
     }
   }
-  
+  #predictions <- predictions[order(predictions$score, decreasing = T)]
   return(predictions$target)
 }
 
@@ -88,10 +91,12 @@ predict <- function(input,num.results = 3) {
 
 #library(doParallel)
 #library(tm)
+#library(stringi)
 
-load("test.data.last.word.RData")
+load("mini.test.data.last.word.RData")
 
-#nodes <- detectCores() - 1
+#test.data.last.word <- test.data.last.word[1:1000]
+#nodes <- detectCores() - 2
 #cl <- makeCluster(nodes)
 #registerDoParallel(cl)
 
@@ -100,21 +105,42 @@ testPrediction <- function(input,target){
 }
 
 
-library(rbenchmark)
+#mini.test.data.last.word <- test.data.last.word[1:100000,]
+#save(mini.test.data.last.word,file="mini.test.data.last.word.RData")
+
+test.results <- mapply(testPrediction,mini.test.data.last.word[,1],minitest.data.last.word[,2], USE.NAMES = F)
 
 
-benchmark(pNew = sapply(test.data.last.word[1:2000,1],predict), replications = 1)
 
-predictNew(input)
-
-test.results <- mapply(testPrediction,test.data.last.word[1:100,1],test.data.last.word[1:100,2], USE.NAMES = F)
-
-# test.results <- foreach(i=1:100) %dopar% {
-#   testPrediction(test.data.last.word[i,1],test.data.last.word[i,2])
-# }
+accuracy <- sum(test.results)/length(test.results)
+accuracy
 
 
-sum(test.results)/length(test.results)
+
+#------------------------------------------------------------------------------
+
+
+
+#Context checking--------------------------------------------------------------
+#reside 
+#Check for the words, in the unigram, the probabiliticy to be in the same phrase that contains a word that has the meaning of residde.
+
+
+text1 <- "I really love this place, really. Live in New York is one os the best things I have done. Kisses to  everyone, ok?"
+text2 <- "New yOrk is the best place to reside!"
+text3 <- "Anyone that lives in new york herE? I cant find a good restaurant in new york"
+text.sample <- c(text1,text2,text3)
+target <- "york"
+
+text.sample <- tolower(text.sample)
+
+phrases <- as.vector(stri_split_regex(text.sample,pattern="[\\.\\?!]", simplify = T, omit_empty = T))
+
+phrases.with.target <- phrases[grepl(target,phrases)]
+
+#TODO count how many phrases have a work in the group. #Frequency
+#TODO divide abouve count / number of phrases with target. #Probabilit
+
 
 
 
