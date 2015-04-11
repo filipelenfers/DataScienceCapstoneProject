@@ -5,6 +5,8 @@
 library(tm)
 library(data.table)
 
+#TODO remove < 3 frquency N-grams does not impact accuracy, and giveme a lot of economy in memory. Should check this removal better to remove more useless data.
+
 #All the data has the score pre calculated considering alpha as 0.4
 load("spData.RData")
 
@@ -132,15 +134,19 @@ text3 <- "Anyone that lives in new york herE? I cant find a good restaurant in n
 text.sample <- c(text1,text2,text3)
 target <- "york"
 
+reside.dictionary <- c("reside", "live", "inhabit")
+reside.pattern <- sprintf("%s",paste(reside.dictionary,collapse="|"))
+
 text.sample <- tolower(text.sample)
 
 phrases <- as.vector(stri_split_regex(text.sample,pattern="[\\.\\?!]", simplify = T, omit_empty = T))
 
 phrases.with.target <- phrases[grepl(target,phrases)]
 
-#TODO count how many phrases have a work in the group. #Frequency
-#TODO divide abouve count / number of phrases with target. #Probabilit
-
+#count how many phrases have a work in the group. #Frequency
+#sum(grepl(reside.pattern,phrases.with.target))
+#divide abouve count / number of phrases with target. #Probabilit
+sum(grepl(reside.pattern,phrases.with.target))/length(phrases.with.target)
 
 
 
