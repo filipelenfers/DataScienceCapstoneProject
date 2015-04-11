@@ -8,7 +8,7 @@ library(data.table)
 
 
 #All the data has the score pre calculated considering alpha as 0.4
-load("spData.RData")
+load("spData3.RData")
 
 # remove < 5 frquency N-grams does not impact accuracy, and giveme a lot of economy in memory. Should check this removal better to remove more useless data.
 #tetragram.data.table <- tetragram.data.table[Freq > 5]
@@ -65,22 +65,22 @@ predict <- function(input,num.results = 3) {
   
   #4-gram case, 1.0 (for this 4-gram model) , just the top num.results
   tetragram.subset <- tetragram.data.table[key == tetragram.key,]
-  #tetragram.subset$score <- tetragram.subset$prob
   predictions <- head(tetragram.subset[order(tetragram.subset$score, decreasing = T)],n = num.results)
   num.rows <- nrow(predictions)
   #print(paste("Num.rows tetragram",num.rows))
   if(num.rows < num.results) {
     #3-gram case, 0.4 (for this 4-gram model) , just the top num.results
     trigram.subset <- trigram.data.table[key == trigram.key,]
-    #trigram.subset$score <- trigram.subset$prob * alpha
+    trigram.subset <- trigram.subset[!(trigram.subset$target %chin% predictions$target),]
     trigram.predictions <- head(trigram.subset[order(trigram.subset$score, decreasing = T)],n = num.results-num.rows)
+    
     predictions <- rbind(predictions, trigram.predictions)
     num.rows <- nrow(predictions)
     
     if(num.rows < num.results) {
       #2-gram case, 0.4 * 0.4 (for this 4-gram model) , just the top num.results
       bigram.subset <- bigram.data.table[key == bigram.key,]
-      #bigram.subset$score <- bigram.subset$prob * (alpha ^ 2)
+      bigram.subset <- bigram.subset[!(bigram.subset$target %chin% predictions$target),]
       bigram.predictions <- head(bigram.subset[order(bigram.subset$score, decreasing = T)],n = num.results-num.rows)
       predictions <- rbind(predictions, bigram.predictions)
       num.rows <- nrow(predictions)     
