@@ -5,10 +5,17 @@
 library(tm)
 library(data.table)
 
-#TODO remove < 3 frquency N-grams does not impact accuracy, and giveme a lot of economy in memory. Should check this removal better to remove more useless data.
+
 
 #All the data has the score pre calculated considering alpha as 0.4
 load("spData.RData")
+
+# remove < 5 frquency N-grams does not impact accuracy, and giveme a lot of economy in memory. Should check this removal better to remove more useless data.
+#tetragram.data.table <- tetragram.data.table[Freq > 5]
+#trigram.data.table <- trigram.data.table[Freq > 5]
+#bigram.data.table <- bigram.data.table[Freq > 5]
+
+#save(tetragram.data.table,trigram.data.table,bigram.data.table, unigram.predictions.cache.data.table, file = "spData3.RData")
 
 
 #Stupid backoff 4-gram------------------------------------------------------------------------------
@@ -110,7 +117,7 @@ testPrediction <- function(input,target){
 #mini.test.data.last.word <- test.data.last.word[1:100000,]
 #save(mini.test.data.last.word,file="mini.test.data.last.word.RData")
 
-test.results <- mapply(testPrediction,mini.test.data.last.word[,1],minitest.data.last.word[,2], USE.NAMES = F)
+test.results <- mapply(testPrediction,mini.test.data.last.word[,1],mini.test.data.last.word[,2], USE.NAMES = F)
 
 
 
