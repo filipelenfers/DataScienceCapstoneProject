@@ -1,0 +1,28 @@
+Next Word Predictor
+========================================================
+author: Filipe Pais Lenfers
+A presentation for the Coursera/JHU Data Science Capstone Project.
+
+Overview
+========================================================
+
+For more details on authoring R presentations click the
+**Help** button on the toolbar.
+
+- Bullet 1
+- Bullet 2
+- Bullet 3
+
+Algorithm
+========================================================
+
+```{r}
+summary(cars)
+```
+
+How to use?
+========================================================
+
+```{r, echo=FALSE}
+plot(cars)
+```
