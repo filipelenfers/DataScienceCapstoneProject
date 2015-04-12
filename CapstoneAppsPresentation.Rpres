@@ -3,26 +3,34 @@ Next Word Predictor
 author: Filipe Pais Lenfers
 A presentation for the Coursera/JHU Data Science Capstone Project.
 
-Overview
+Introduction
 ========================================================
 
-For more details on authoring R presentations click the
-**Help** button on the toolbar.
+The Next Word Predictor is an web application that given a sentence can predict the next word.
 
-- Bullet 1
-- Bullet 2
-- Bullet 3
+Predict next word for a sentence can be used in devices where is difficult to type, like cellphones, to show the user autocomplete options of next possible words. So the user can type the text more fast and with less type errors.
+
+In this presentation the following topics will be presented:
+- The algorithm used
+- How to use the app
+- Next steps
 
 Algorithm
 ========================================================
 
-```{r}
-summary(cars)
-```
+- [N-grams](http://en.wikipedia.org/wiki/N-gram) models are used to map the most frequent sequencies of words. Unigrams, Bigrams, Trigrams and Tetragrams were used in the app. All the data to process the n-grams was obtained from sources of news, blogs and twitters.
+- The algorithm used is [Stupid Backoff](http://www.aclweb.org/anthology/D07-1090.pdf), this algorithm is very simple and fast, but its quality on prediction approach some of the state of art algorithms (like Kneser-Ney Smoothing) when its trained on large datasets. More information about this algorithm can be found here: [http://www.aclweb.org/anthology/D07-1090.pdf](http://www.aclweb.org/anthology/D07-1090.pdf).
+    - Basically the algorithm try to use the 4-grams to predict the next word, if less then 3 unique words are found it backoff to the 3-gram and so on, until it completes 3 unique words for the prediction.
+    - When nothing is found we use the most frequent words of the unigram.
 
 How to use?
 ========================================================
 
-```{r, echo=FALSE}
-plot(cars)
-```
+![alt text](figures/appScreenshoot.png)
+
+Next Steps
+========================================================
+
+- The algorithm used
+- How to use the app
+- Next steps
