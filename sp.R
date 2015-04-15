@@ -8,7 +8,7 @@ library(data.table)
 
 
 #All the data has the score pre calculated considering alpha as 0.4
-load("spData3.RData")
+load("spData4.RData")
 
 # remove < 5 frquency N-grams does not impact accuracy, and giveme a lot of economy in memory. Should check this removal better to remove more useless data.
 #tetragram.data.table <- tetragram.data.table[Freq > 5]
@@ -16,6 +16,33 @@ load("spData3.RData")
 #bigram.data.table <- bigram.data.table[Freq > 5]
 
 #save(tetragram.data.table,trigram.data.table,bigram.data.table, unigram.predictions.cache.data.table, file = "spData3.RData")
+
+#----------------------------------------------------------------
+#keep the best 3 scores for each key
+library(data.table)
+library(dplyr)
+
+onlyTop3ForKey <- function(ngram.data.table){
+  group.order.by.score <- ngram.data.table %>% group_by(key) %>% arrange(desc(score)) %>% mutate(group.count = n())
+  ngram.data.table <- union(group.order.by.score %>% filter(group.count > 3) %>% group_by(key) %>% slice(1:3),
+                            group.order.by.score %>% filter(group.count <= 3))
+  ngram.data.table <- ngram.data.table %>% select(key,target,score)
+  ngram.data.table <- data.table(ngram.data.table)
+  setkey(ngram.data.table,"key")
+  ngram.data.table  
+}
+
+tetragram.data.table <- onlyTop3ForKey(tetragram.data.table)
+trigram.data.table <- onlyTop3ForKey(trigram.data.table)
+bigram.data.table <- onlyTop3ForKey(bigram.data.table)
+
+unigram.predictions.cache.data.table <- unigram.predictions.cache.data.table %>% select(key,target,score)
+unigram.predictions.cache.data.table <- data.table(unigram.predictions.cache.data.table)
+setkey(unigram.predictions.cache.data.table,"key")
+
+save(tetragram.data.table,trigram.data.table,bigram.data.table, unigram.predictions.cache.data.table, file = "spData4b.RData")
+
+#----------------------------------------------------------------
 
 
 #Stupid backoff 4-gram------------------------------------------------------------------------------
