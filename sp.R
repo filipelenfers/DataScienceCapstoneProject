@@ -9,6 +9,7 @@ library(data.table)
 
 #All the data has the score pre calculated considering alpha as 0.4
 load("spData4.RData")
+load("reside.prob.RData")
 
 # remove < 5 frquency N-grams does not impact accuracy, and giveme a lot of economy in memory. Should check this removal better to remove more useless data.
 #tetragram.data.table <- tetragram.data.table[Freq > 5]
@@ -19,28 +20,28 @@ load("spData4.RData")
 
 #----------------------------------------------------------------
 #keep the best 3 scores for each key
-library(data.table)
-library(dplyr)
-
-onlyTop3ForKey <- function(ngram.data.table){
-  group.order.by.score <- ngram.data.table %>% group_by(key) %>% arrange(desc(score)) %>% mutate(group.count = n())
-  ngram.data.table <- union(group.order.by.score %>% filter(group.count > 3) %>% group_by(key) %>% slice(1:3),
-                            group.order.by.score %>% filter(group.count <= 3))
-  ngram.data.table <- ngram.data.table %>% select(key,target,score)
-  ngram.data.table <- data.table(ngram.data.table)
-  setkey(ngram.data.table,"key")
-  ngram.data.table  
-}
-
-tetragram.data.table <- onlyTop3ForKey(tetragram.data.table)
-trigram.data.table <- onlyTop3ForKey(trigram.data.table)
-bigram.data.table <- onlyTop3ForKey(bigram.data.table)
-
-unigram.predictions.cache.data.table <- unigram.predictions.cache.data.table %>% select(key,target,score)
-unigram.predictions.cache.data.table <- data.table(unigram.predictions.cache.data.table)
-setkey(unigram.predictions.cache.data.table,"key")
-
-save(tetragram.data.table,trigram.data.table,bigram.data.table, unigram.predictions.cache.data.table, file = "spData4b.RData")
+# library(data.table)
+# library(dplyr)
+# 
+# onlyTop3ForKey <- function(ngram.data.table){
+#   group.order.by.score <- ngram.data.table %>% group_by(key) %>% arrange(desc(score)) %>% mutate(group.count = n())
+#   ngram.data.table <- union(group.order.by.score %>% filter(group.count > 3) %>% group_by(key) %>% slice(1:3),
+#                             group.order.by.score %>% filter(group.count <= 3))
+#   ngram.data.table <- ngram.data.table %>% select(key,target,score)
+#   ngram.data.table <- data.table(ngram.data.table)
+#   setkey(ngram.data.table,"key")
+#   ngram.data.table  
+# }
+# 
+# tetragram.data.table <- onlyTop3ForKey(tetragram.data.table)
+# trigram.data.table <- onlyTop3ForKey(trigram.data.table)
+# bigram.data.table <- onlyTop3ForKey(bigram.data.table)
+# 
+# unigram.predictions.cache.data.table <- unigram.predictions.cache.data.table %>% select(key,target,score)
+# unigram.predictions.cache.data.table <- data.table(unigram.predictions.cache.data.table)
+# setkey(unigram.predictions.cache.data.table,"key")
+# 
+# save(tetragram.data.table,trigram.data.table,bigram.data.table, unigram.predictions.cache.data.table, file = "spData4b.RData")
 
 #----------------------------------------------------------------
 
@@ -49,7 +50,7 @@ save(tetragram.data.table,trigram.data.table,bigram.data.table, unigram.predicti
 # http://www.aclweb.org/anthology/D07-1090.pdf
 
 ##Parameters
-input <- "Very early observations on the Bills game: Offense still struggling but the"
+#input <- "I love to live in New"
 
 
 
@@ -72,6 +73,9 @@ input <- "Very early observations on the Bills game: Offense still struggling bu
 #setkey(bigram.data.table,key)
 #unigram.predictions.cache.data.table <- as.data.table(unigram.predictions.cache)
 
+reside.dictionary <- c("\\sreside", "\\slive", "\\sinhabit")
+reside.pattern <- sprintf("%s",paste(reside.dictionary,collapse="|"))
+
 
 predict <- function(input,num.results = 3) {
   #Clean input
@@ -92,6 +96,9 @@ predict <- function(input,num.results = 3) {
   
   #4-gram case, 1.0 (for this 4-gram model) , just the top num.results
   tetragram.subset <- tetragram.data.table[key == tetragram.key,]
+  if(stri_detect_regex(input,reside.pattern)){
+    tetragram.subset$score <- tetragram.subset$score * reside.prob[reside.prob$word %chin% tetragram.subset$target]$prob  
+  }
   predictions <- head(tetragram.subset[order(tetragram.subset$score, decreasing = T)],n = num.results)
   num.rows <- nrow(predictions)
   #print(paste("Num.rows tetragram",num.rows))
