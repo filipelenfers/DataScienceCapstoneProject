@@ -30,7 +30,7 @@ You can access the app here: [https://filipelenfers.shinyapps.io/CapstoneShiny/]
 
 Just fill the box below "Input the sentence:" and click on submit. The 3 predictions will be show on the right side, ordered by relevance.
 
-![alt text](figures/appScreenshoot.png)
+![alt text](figures/appScreenshoot2.png)
 
 Conclusion & Next Steps
 ========================================================
