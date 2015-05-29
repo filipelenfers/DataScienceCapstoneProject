@@ -7,6 +7,8 @@ blogs <- readLines("data/en_US/en_US.blogs.txt", encoding="UTF-8")
 twitter <- readLines("data/en_US/en_US.twitter.txt", encoding="UTF-8")
 news  <- readLines("data/en_US/en_US.news.txt", encoding="UTF-8")
 
+sample(twitter,5)
+
 profanity.words <- readLines("en_profanity_words.txt")
 
 #sample_blogs <- sample(blogs,100000)

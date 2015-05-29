@@ -1,7 +1,6 @@
 .Rproj.user
 .Rhistory
 .RData
-data
 milestoneReport_cache
 
 domino.log
@@ -9,3 +8,7 @@ domino.log
 testes.R
 
 modelagem1.RData
+
+reside.prob.RData
+/*.RData
+data/
